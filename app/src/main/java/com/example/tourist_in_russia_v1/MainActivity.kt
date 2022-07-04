@@ -1,6 +1,8 @@
 package com.example.tourist_in_russia_v1
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -21,7 +23,7 @@ class MainActivity : AppCompatActivity() {
     private val listCities = mutableListOf<String>()
     lateinit var binding: ActivityMainBinding
     private val adapter = CityAdapter(this)
-    val imglistTyr = listOf(R.drawable.image1, R.drawable.image2, R.drawable.image3)
+
     lateinit var database: DatabaseReference
 
 
@@ -29,20 +31,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        // костыли |
         database = Firebase.database.reference
-        writeNewTyr(
-            "Сочи",
-            "0",
-            "SochiTyr1",
-            "Descriptions",
-            "https://7d9e88a8-f178-4098-bea5-48d960920605.selcdn.net/29b3acc9-42fb-4b42-8a2a-ff371d2a6066/-/format/jpeg/-/quality/lighter/-/stretch/off/-/resize/1900x/"
-        )
-        getTyr("Города", "Москва", "1")
-        getTyr("Города", "Сочи", "1")
         getListCities()
-// Firabase костыли ..
-
         init()
 
     }
@@ -51,7 +41,10 @@ class MainActivity : AppCompatActivity() {
         binding.apply {
             recycler.layoutManager = LinearLayoutManager(this@MainActivity)
             recycler.adapter = adapter
-
+            about.setOnClickListener {
+                val intent = Intent(this@MainActivity, About::class.java)
+                startActivity(intent)
+            }
         }
 
 
@@ -92,40 +85,27 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("NotifyDataSetChanged")
     private fun getListCities() {
 
-        database.child("Cities").child("0").get().addOnSuccessListener { data ->
-            val city = data.value.toString()
-            Log.w("myTag", city)
-        }
 
-        database.child("Города").get().addOnSuccessListener { data ->
-            val city = data.value
-            Log.v("TAG", city.toString())
-
-
-        }
-        database.addValueEventListener(object : ValueEventListener {
+        val valueEventListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                Log.v("snap", dataSnapshot.value.toString())
+                for (ds in dataSnapshot.child("Cities1").children) {
+                    val city =
+                        ds.getValue(
+                            City::class.java
+                        )
+                    if (city != null) {
+                        adapter.addCity(city)
+                    }
+
+                }
+
             }
 
-            override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.d("TAG", databaseError.getMessage())
             }
-
-        })
-
-        database.child("Cities").get().addOnSuccessListener { data ->
-            val city = data.value as List<String>
-            Log.v("myTag", city.joinToString())
-            adapter.CitiesList = city.map {
-                City(it)
-            }.toMutableList() as ArrayList<City>
-            adapter.notifyDataSetChanged()
         }
-
-
+        database.addListenerForSingleValueEvent(valueEventListener)
     }
-
-
 }
 
