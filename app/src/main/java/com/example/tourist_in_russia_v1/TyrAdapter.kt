@@ -1,5 +1,6 @@
 package com.example.tourist_in_russia_v1
 
+import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,10 +17,15 @@ class TyrAdapter : RecyclerView.Adapter<TyrAdapter.TyrHolder>() {
         fun bind(tyr: Tyr) = with(binding)
         {
             // картинка использовать Picassoo URL imageTyr
-            Picasso.get().load(tyr.imageId).placeholder(androidx.appcompat.R.drawable.abc_list_selector_holo_dark).error(R.drawable.image1).into(imageTyr)
+
+            Picasso.get().load(tyr.imageId).fit()
+                .placeholder(androidx.appcompat.R.drawable.abc_list_selector_holo_dark)
+                .error(R.drawable.image1).into(imageTyr)
             name.text = tyr.tyrName
-            descriptions.text = tyr.tyrInfo
-            
+
+            descriptions.text = tyr.tyrInfo.replace("_b","\n");
+            podrobnee.movementMethod = LinkMovementMethod.getInstance()
+
         }
 
 
