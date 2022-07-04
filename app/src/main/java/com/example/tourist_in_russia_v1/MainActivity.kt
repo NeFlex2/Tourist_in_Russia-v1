@@ -19,7 +19,6 @@ import com.google.firebase.ktx.Firebase
 import java.util.ArrayList
 
 class MainActivity : AppCompatActivity() {
-    private val listTyr = mutableListOf<Tyr>()
     private val listCities = mutableListOf<String>()
     lateinit var binding: ActivityMainBinding
     private val adapter = CityAdapter(this)
@@ -46,41 +45,7 @@ class MainActivity : AppCompatActivity() {
                 startActivity(intent)
             }
         }
-
-
     }
-
-    fun writeNewTyr(
-        nameCity: String,
-        tyrId: String,
-        tyrName: String,
-        tyrInfo: String,
-        imageUrl: String
-    ) {
-        val tyr = Tyr(tyrName = tyrName, tyrInfo = tyrInfo, imageId = imageUrl)
-        database.child("Города").child(nameCity).child(tyrId).setValue(tyr)
-    }
-
-    fun getTyr(frstChild: String, nameCity: String, tyrId: String) {
-
-        database.child(frstChild).child(nameCity).child(tyrId).child("tyrName").get()
-            .addOnSuccessListener { data ->
-                val nameTyr = data.value.toString()
-                Log.w("myTag", nameTyr)
-            }
-        database.child(frstChild).child(nameCity).child(tyrId).child("tyrInfo").get()
-            .addOnSuccessListener { data ->
-                val infoTyr = data.value.toString()
-                Log.w("myTag", infoTyr)
-            }
-        database.child(frstChild).child(nameCity).child(tyrId).child("imageId").get()
-            .addOnSuccessListener { data ->
-                val imageUrl = data.value.toString()
-                Log.w("myTag", imageUrl)
-            }
-
-    }
-
 
     @SuppressLint("NotifyDataSetChanged")
     private fun getListCities() {
